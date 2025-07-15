@@ -1,0 +1,65 @@
+<solids>
+    <box name="WorldSolid" x="world_size" y="world_size" z="world_size" lunit="mm"/>
+    <tube name="micromegasSolid" startphi="0" deltaphi="360" rmin="0" rmax="50" z="30" aunit="deg" lunit="mm"/>
+    <tube name="copperSolidFilled" startphi="0" deltaphi="360" rmin="0" rmax="70" z="50" aunit="deg" lunit="mm"/> 
+    <tube name="leadSolidFilled" startphi="0" deltaphi="360" rmin="0" rmax="170" z="250" aunit="deg" lunit="mm"/> 
+    <tube name="scintSolidFilled" startphi="0" deltaphi="360" rmin="0" rmax="270" z="450" aunit="deg" lunit="mm"/> 
+    <subtraction name="copperSolid">
+        <first ref="copperSolidFilled"/> 
+        <second ref="micromegasSolid"/>
+    </subtraction>
+    <subtraction name="leadSolid">
+        <first ref="leadSolidFilled"/> 
+        <second ref="copperSolidFilled"/>
+    </subtraction>
+    <subtraction name="scintSolid">
+        <first ref="scintSolidFilled"/> 
+        <second ref="leadSolidFilled"/>
+    </subtraction>
+</solids>
+
+<structure>
+
+<volume name="micromegasVolume">
+    <materialref ref="${GAS_VOLUME}"/>
+    <solidref ref="micromegasSolid"/>
+</volume>
+<volume name="copperVolume">
+    <materialref ref="Copper"/>
+    <solidref ref="copperSolid"/>
+</volume>
+<volume name="leadVolume">
+    <materialref ref="Lead"/>
+    <solidref ref="leadSolid"/>
+</volume>
+<volume name="scintVolume">
+    <materialref ref="EJ_301"/>
+    <solidref ref="scintSolid"/>
+</volume>
+
+<!-- {{{ Physical volume definition (volume and position assignment) -->
+<volume name="World">
+    <materialref ref="Vacuum"/>
+    <solidref ref="WorldSolid"/>
+
+    <physvol name="micromegas">
+        <volumeref ref="micromegasVolume"/>
+        <position name="micromegasPosition" unit="mm" x="0" y="0" z="0"/>
+    </physvol>
+    <physvol name="copperVeto">
+        <volumeref ref="copperVolume"/>
+        <position name="copperPosition" unit="mm" x="0" y="0" z="0"/>
+    </physvol>
+    <physvol name="leadVeto">
+        <volumeref ref="leadVolume"/>
+        <position name="leadPosition" unit="mm" x="0" y="0" z="0"/>
+    </physvol>
+    <physvol name="scint">
+        <volumeref ref="scintVolume"/>
+        <position name="scintPosition" unit="mm" x="0" y="0" z="0"/>
+    </physvol>
+
+</volume>
+<!-- }}} -->
+
+</structure>
