@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!--By default REST units are mm, keV and degrees-->
+<restG4>
+    <globals>
+        <!--<variable name="REST_ISOTOPE" value="Cd109" overwrite="false"/> -->  <!--Here I define the isotope: Fe55, Cs137, Cd109-->
+        <parameter name="mainDataPath" value=""/>
+        <parameter name="verboseLevel" value="essential"/>
+    </globals>
+    <TRestRun name="Run metadata" title="REST Metadata run info (template)">
+        <parameter name="experimentName" value="Argon1ISO_6cmDrift"/>    
+
+        <parameter name="runType" value="simulation"/>
+        <parameter name="runNumber" value="auto"/>
+        <parameter name="runTag" value="${NAME}"/> 
+        <!--<parameter name="outputFileName" value="simFiles_${NAME}/RestG4_${PRESSURE}_[runNumber].root"/> -->  <!--Specify the length!!-->
+        <parameter name="outputFileName" value="simFiles_${NAME}/RestG4_run[fRunNumber]_${PRESSURE}bar_[fRunTag]_[fExperimentName]_v[fVersion].root"/>
+        <parameter name="runDescription" value=""/>
+        <parameter name="user" value="${USER}"/>
+        <parameter name="overwrite" value="off"/>
+        <parameter name="readOnly" value="false"/>
+    </TRestRun>
+    <TRestGeant4Metadata name="xrays" title="xrays">
+        <parameter name="gdmlFile" value="geometry/IAXO-D1/${GEOMETRY}"/>
+        <parameter name="subEventTimeDelay" value="100" units="us"/>
+        <parameter name="seed" value="1001"/>
+        <!--<parameter name="nEvents" value="100000"/> -->
+        <!-- <parameter name="nRequestedEntries" value="10"/> --> <!-- It is not working. I can launch it as restG4 Fe55_Ar -e 10 (this would keep 10 entries) -->
+        <parameter name="registerEmptyTracks" value="false"/>
+        <parameter name="saveAllEvents" value="false"/>
+
+        <!-- Spectrum point generator -->
+<!--
+        <generator type="point" position="(0,0,${POSITION})mm" >
+            <source particle="gamma" fullChain="on"> 
+                <energy type="TH1D" file="histograms/${NAME}_histogram.root" name="${NAME}" range="${RANGE}" units="keV" /> -->  <!--aN_histogram.root (name="aN")  ABC_histogram.root   Primakoff_histogram.root (name=("primakoff"))-->
+           <!-- <angular type="flux" direction="(0,0,-1)"/>
+            </source>
+        </generator>
+-->
+
+        <!-- Monoenergetic point generator -->
+        <generator type="point" position="(0,0,${POSITION})mm" >
+            <source particle="gamma" fullChain="on"> 
+                <energy type="mono" energy="${ENERGY}" units="keV" /> 
+                <angular type="flux" direction="(0,0,-1)"/>
+            </source>
+        </generator> 
+
+       <!-- Flat spectrum point generator -->
+        <!--
+        <generator type="point" position="(0,0,${POSITION})mm" >
+            <source particle="gamma" fullChain="on"> 
+                <energy type="flat" energy="(0,10)" units="keV" /> 
+                <angular type="flux" direction="(0,0,-1)"/>
+            </source>
+        </generator> 
+        -->
+        <!-- some tests -->
+        <!--<generator type="surface" shape="circle"
+                    position="(0,0,25)mm" size="(15,0,0)mm"
+                    rotationAngle="0deg" rotationAxis="(0,0,1)"> 
+                <source particle="gamma" fullChain="on"> 
+                    <energy type="flat" range="(0,15)keV"/> 
+                    <energy type="mono" energy="${ENERGY}" units="keV" /> 
+                    <angular type="flux" direction="(0,0,-1)"/>
+                </source>
+            </generator>-->
+
+
+        <detector>
+            <!--<parameter name="energyRange" value="(0,40)" units="keV"/>-->   <!--removed, to avoid the elimination of higher energy events that deposite less energy-->
+            <parameter name="activateAllVolumes" value="true"/>
+            <volume name="gas" sensitive="true" maxStepSize="0.005mm"/>
+        </detector>
+    </TRestGeant4Metadata>
+    <TRestGeant4PhysicsLists name="default" title="First physics list implementation."><parameter name="cutForGamma" value="0.01" units="mm"/><parameter name="cutForElectron" value="2" units="mm"/><parameter name="cutForPositron" value="1" units="mm"/><parameter name="cutForMuon" value="1" units="mm"/><parameter name="cutForNeutron" value="1" units="mm"/><parameter name="minEnergyRangeProductionCuts" value="0.1" units="keV"/><parameter name="maxEnergyRangeProductionCuts" value="1" units="GeV"/>
+
+        // Use only one EM physics list
+        <!-- EM Physics lists -->
+        <!--<physicsList name="G4EmLivermorePhysics"> </physicsList> -->
+        <!--<physicsList name="G4EmPenelopePhysics"> </physicsList> -->
+        <physicsList name="G4EmStandardPhysics_option4"/>
+
+        <!-- Decay physics lists -->
+        <physicsList name="G4DecayPhysics"/>
+        <physicsList name="G4RadioactiveDecayPhysics"/>
+        <physicsList name="G4RadioactiveDecay"><option name="ICM" value="true"/><option name="ARM" value="true"/></physicsList>
+
+        <!-- Hadron physics lists -->
+        <!--<physicsList name="G4HadronElasticPhysicsHP"/> -->
+        <physicsList name="G4IonBinaryCascadePhysics"/>
+        <!--<physicsList name="G4HadronPhysicsQGSP_BIC_HP"/> -->
+        <!--<physicsList name="G4NeutronTrackingCut"/> --> 
+        <physicsList name="G4EmExtraPhysics"/>
+
+    </TRestGeant4PhysicsLists>
+</restG4>
