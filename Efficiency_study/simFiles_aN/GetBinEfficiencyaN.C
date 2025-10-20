@@ -10,7 +10,7 @@ void GetBinEfficiencyaN(std::string file2_name = "", int nL = 0, std::string out
 
     // Ask for parameters if not provided
     if (file2_name.empty()) {
-        std::cout << "Enter the name of the second ROOT file: ";
+        std::cout << "Enter the name of the ROOT file: ";
         std::cin >> file2_name;
     }
     if (nL == 0) {
