@@ -81,6 +81,8 @@ This command will analyze all files whose names match the given pattern, where *
 
 ## Nominal fluxes
 
+The purpose of this study is to determine the detector's efficiency to different axion spectra: axion-photon, axion-electron and axion-nucleon, which can be found in the `Histograms` directory.
+
 ### Example of use
 
 ## Analyzed fluxes
