@@ -110,15 +110,16 @@ for (int bin = 1; bin <= hist->GetNbinsX(); ++bin) {
     
     
     // Get bin-by-bin efficiency and reescalated histogram
-    int nL=232143;
     int nBins2 = hist2->GetNbinsX();
     for (int i = 1; i <= nBins2; ++i) {
         double binContent = hist1->GetBinContent(i);
         double binContent2 = hist2->GetBinContent(i);
-        double ResultingFlux=binContent*binContent2/(binContent / integral * nL);
-        if (binContent==0) {
+
+if (binContent==0) {
           ResultingFlux=0;
         }
+        double ResultingFlux=binContent*binContent2/(binContent / integral * nL);
+        
         double error=sqrt(binContent2)/nL*integral;
         histResultingFlux->SetBinContent(i, ResultingFlux); // Fill the new histogram
         histResultingFlux->SetBinError(i, error);
