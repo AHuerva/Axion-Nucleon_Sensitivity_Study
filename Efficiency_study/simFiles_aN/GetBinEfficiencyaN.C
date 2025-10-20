@@ -1,10 +1,26 @@
 #include <TFile.h>
 #include <TTree.h>
-#include <iostream>
 #include <TH1.h>
+#include <iostream>
+#include <string>
+#include <cmath>
 
-void GetBinEfficiencyaN() {
 
+void GetBinEfficiencyaN(std::string file2_name = "", int nL = 0, std::string output_name = "") {
+
+    // Ask for parameters if not provided
+    if (file2_name.empty()) {
+        std::cout << "Enter the name of the second ROOT file: ";
+        std::cin >> file2_name;
+    }
+    if (nL == 0) {
+        std::cout << "Enter the value of nL: ";
+        std::cin >> nL;
+    }
+    if (output_name.empty()) {
+        std::cout << "Enter the name of the output ROOT file: ";
+        std::cin >> output_name;
+    }
     // Open the files
     TFile *file1 = TFile::Open("aN_histogram.root");
     if (!file1 || file1->IsZombie()) {
@@ -12,7 +28,7 @@ void GetBinEfficiencyaN() {
         return;
     }
     
-    TFile *file2 = TFile::Open("RestG4_run00029_2.0bar_aN-histogram_XeNeISO_6cmDrift_v2.4.3.root");
+    TFile *file2 = TFile::Open(file2_name.c_str());
     if (!file2 || file2->IsZombie()) {
         std::cerr << "An error has occurred while opening spectrum file!" << std::endl;
         return;
@@ -56,18 +72,7 @@ for (int bin = 1; bin <= hist->GetNbinsX(); ++bin) {
         integral += binContent;        
     }
     
-    // Save the Rebinned Flux histogram to a new file
-//    TFile *output_flux = TFile::Open("Rebinned_aN.root", "RECREATE");
-//    if (!output_flux || output_flux->IsZombie()) {
-//        std::cerr << "Error opening the rebinned flux file." << std::endl;
-//        file1->Close();
-//        file2->Close();
-//        return;
-//    }
     
-//    output_flux->cd();
-//    hist1->Write(); // Write the new histogram
-//    output_flux->Close();
     
     
     // Search the tree
@@ -79,14 +84,11 @@ for (int bin = 1; bin <= hist->GetNbinsX(); ++bin) {
     }
 ;
     
-    // Create a histogram with specified number of bins
-    int range_min2=range_min;
-    int range_max2=range_max;
-    TH1F *hist2 = new TH1F("hist3", "Deposited Energy Histogram", number_of_bins, range_min2, range_max2);
+    // Create histogram for deposited energy
+    TH1F *hist2 = new TH1F("hist3", "Deposited Energy Histogram", number_of_bins, range_min, range_max);
 
     // Define variables for branches
     double totalDepositedEnergy;
-    double initialEnergy;
     double sensitiveVolumeEnergy;
     
     // Associate the branches with the variables
@@ -103,7 +105,7 @@ for (int bin = 1; bin <= hist->GetNbinsX(); ++bin) {
     }
    
     // Create a histogram for ResultingFlux
-    TH1F *histResultingFlux = new TH1F("histResultingFlux", "Resulting Flux Histogram", number_of_bins, range_min2, range_max2);
+    TH1F *histResultingFlux = new TH1F("histResultingFlux", "Resulting Flux Histogram", number_of_bins, range_min, range_max);
 
     
     
@@ -125,7 +127,7 @@ for (int bin = 1; bin <= hist->GetNbinsX(); ++bin) {
     }
     
     // Save the ResultingFlux histogram to a new file
-    TFile *output_file = TFile::Open("aN6cmXenon2.0bar.root", "RECREATE");
+    TFile *output_file = TFile::Open(output_name.c_str(), "RECREATE");
     if (!output_file || output_file->IsZombie()) {
         std::cerr << "Error opening the output file." << std::endl;
         file1->Close();
@@ -137,11 +139,11 @@ for (int bin = 1; bin <= hist->GetNbinsX(); ++bin) {
     histResultingFlux->Write(); // Write the new histogram
     output_file->Close();
     
-    
-    
-    
+
     
     file1->Close();
     file2->Close();
+
+std::cout << "Output saved as: " << output_name << std::endl;
     
 }
