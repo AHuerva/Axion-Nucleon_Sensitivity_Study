@@ -168,4 +168,72 @@ where `aN3cmXenon2.0bar.root` must match the name of the output histogram file.
 
 ## Analyzed fluxes
 
+Once the nominal fluxes are obtained, they are used as input for the analysis. In this study, the detector’s resolution is taken into account, including the effects of electron diffusion. To run these simulations, execute `launchAna.sh`. This will generate one output file per simulation, which can be analyzed using the appropriate `GetAnalysisEfficiency.C` script located in the corresponding directory (e.g. `simFiles_aN`). 
+
+The resulting ROOT histogram shows the detected flux after all interactions within the detector have been simulated.
+
 ### Example of use
+
+To run a simulation, open `launchAna.sh` and edit it with the desired parameters. Example:
+
+```bash
+
+export NAME=aN
+export PRESSURE=2.0
+export DRIFT=3
+filename="simFiles_${NAME}/RestG4_run00029_2.0bar_aN-histogram_XeNeISO_3cmDrift_v2.4.3.root"
+if [ -f "$filename" ]; then
+        # Launch restManager with the constructed filename. 
+        restManager --c Ar_Analysis.rml --f "$filename" 
+    else
+        echo "File $filename does not exist."
+    fi
+
+```
+Then, execute the script.
+
+```bash
+
+./launchAna.sh
+
+```
+
+
+Explanation of parameters:
+
+
+`NAME` refers to the corresponding axion spectra, so that the ROOT file is generated in the appropriate directory (in this case `simFiles_aN`).
+
+`PRESSURE` must match the pressure in `filename`.
+
+`DRIFT` must match the drift distance in `filename`.
+
+`MIXTURE` corresponds to `Xenon-Neon 48.85Pct-Iso 2.3Pct 10-10E3Vcm` for the Xenon mixture and `Argon-Isobutane 1Pct 10-10E3Vcm` for the Argon mixture.
+
+`filename` is the name of the file obtained in the previous study, as it serves as input in this one.
+
+The line `restManager --c Ar_Analysis.rml --f "$filename"` executes the analysis. There is only one file for the Argon and the Xenon mixture, which does not need to be modified.
+
+  - ---------------------------------------------------------
+
+Once the simulation has finished, it can be analyzed by executing `GetAnalysisEfficiencyaN.C` within restRoot. Example:
+
+```bash
+
+restRoot
+
+```
+
+```bash
+
+.x GetAnalysisEfficiencyaN.C("Analysis_R00029_2.0bar_aN-histogram_IAXO-D1_3cmDrift_v2.4.3_signals.root","RestG4_run00029_2.0bar_aN-histogram_XeNeISO_3cmDrift_v2.4.3.root", 315268, "aN3cmXenon2.0bar.root")
+
+```
+
+The first argument is the name of the ROOT file to analyze, the second argument is the name of the input file (obtained in the previous study), the third one (`nL`) is the number of events simulated in order to detect 200,000 events, and the forth one is the name of the output histogram file.
+
+The parameter `nL` can be obtained by opening the input ROOT file and running:
+
+```bash
+xrays->GetNumberOfEvents()
+```
