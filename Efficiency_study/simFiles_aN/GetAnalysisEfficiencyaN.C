@@ -6,10 +6,7 @@
 #include <cmath>
 
 
-
-void GetAnalysisEfficiencyaN(const char* file2Name,
-                             const char* file3Name,
-                             int nL) {
+void GetAnalysisEfficiencyaN(const char* file2Name, const char* file3Name, int nL, const char* outputFileName) {
 
     // --- Open the base histogram file ---
     TFile* file1 = TFile::Open("aN_histogram.root");
@@ -34,23 +31,23 @@ void GetAnalysisEfficiencyaN(const char* file2Name,
         return;
     }
 
-    // --- Load base histogram ---
+    // --- Load the nominal histogram ---
     TH1D* hist = dynamic_cast<TH1D*>(file1->Get("aN"));
     if (!hist) {
-        std::cerr << "Error: Histogram 'aN' not found!" << std::endl;
+        std::cerr << "Error: Histogram 'aN' not found in aN_histogram.root!" << std::endl;
         file1->Close();
         file2->Close();
         file3->Close();
         return;
     }
 
-    // --- Create a new rebinned histogram ---
+    // --- Create a rebinned version of the histogram ---
     const int number_of_bins = 180000;
     double range_min = hist->GetXaxis()->GetXmin();
     double range_max = hist->GetXaxis()->GetXmax();
+
     TH1F* hist1 = new TH1F("hist1", "Rebinned Flux", number_of_bins, range_min, range_max);
 
-    // --- Refill the histogram with threshold ---
     const double threshold = 1e-300;
     for (int bin = 1; bin <= hist->GetNbinsX(); ++bin) {
         double content = hist->GetBinContent(bin);
@@ -58,10 +55,9 @@ void GetAnalysisEfficiencyaN(const char* file2Name,
         hist1->Fill(hist->GetBinCenter(bin), content);
     }
 
-    // --- Integral of the nominal flux ---
     double integral = hist1->Integral();
 
-    // --- Access the EventTree from file3 ---
+    // --- Access EventTree from the spectrum file ---
     TTree* tree = (TTree*)file3->Get("EventTree");
     if (!tree) {
         std::cerr << "Error: 'EventTree' not found in " << file3Name << std::endl;
@@ -71,7 +67,7 @@ void GetAnalysisEfficiencyaN(const char* file2Name,
         return;
     }
 
-    // --- Histogram of deposited energy ---
+    // --- Fill deposited energy histogram ---
     TH1F* hist3 = new TH1F("hist3", "Deposited Energy Histogram", number_of_bins, range_min, range_max);
     double totalDepositedEnergy = 0;
     tree->SetBranchAddress("fTotalDepositedEnergy", &totalDepositedEnergy);
@@ -83,7 +79,7 @@ void GetAnalysisEfficiencyaN(const char* file2Name,
 
     double integral2 = hist3->Integral();
 
-    // --- Access AnalysisTree from file2 ---
+    // --- Access AnalysisTree from the analysis file ---
     TTree* analysisTree = (TTree*)file2->Get("AnalysisTree");
     if (!analysisTree) {
         std::cerr << "Error: 'AnalysisTree' not found in " << file2Name << std::endl;
@@ -102,7 +98,7 @@ void GetAnalysisEfficiencyaN(const char* file2Name,
     analysisTree->SetBranchAddress("g4Ana_Chamber_gasVolumeEDep", &sensitiveVolumeEnergy);
     analysisTree->SetBranchAddress("g4Ana_totalEdep", &initialEnergy);
 
-    // --- Energy distribution histogram ---
+    // --- Histogram for the detected energy ---
     TH1F* hist2 = new TH1F("hist2", "Energy Distribution", number_of_bins, 0, 18);
 
     Long64_t entries = analysisTree->GetEntries();
@@ -116,7 +112,7 @@ void GetAnalysisEfficiencyaN(const char* file2Name,
 
     std::cout << "Entries processed: " << filledEntries << std::endl;
 
-    // --- Resulting Flux Histogram ---
+    // --- Create the resulting flux histogram ---
     TH1F* histResultingFlux = new TH1F("histResultingFlux", "Resulting Flux", number_of_bins, 0, 18);
 
     for (int i = 1; i <= hist2->GetNbinsX(); ++i) {
@@ -127,17 +123,17 @@ void GetAnalysisEfficiencyaN(const char* file2Name,
         histResultingFlux->SetBinError(i, error);
     }
 
-    // --- Save the result ---
-    TFile* outputFile = TFile::Open("AnalysisaN_output.root", "RECREATE");
+    // --- Save the resulting histogram ---
+    TFile* outputFile = TFile::Open(outputFileName, "RECREATE");
     if (!outputFile || outputFile->IsZombie()) {
-        std::cerr << "Error: Could not create output file!" << std::endl;
+        std::cerr << "Error: Could not create output file: " << outputFileName << std::endl;
     } else {
         histResultingFlux->Write();
         outputFile->Close();
-        std::cout << "Result saved to AnalysisaN_output.root" << std::endl;
+        std::cout << "Result saved to " << outputFileName << std::endl;
     }
 
-    // --- Close all files ---
+    // --- Clean up ---
     file1->Close();
     file2->Close();
     file3->Close();
