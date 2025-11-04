@@ -27,7 +27,7 @@ internal values are saved.
         <!-- <parameter name="outputFileName" value="simFiles_${NAME}/Run_Laboratory_30.root"/> --><!--<parameter name="outputFileName" value="simFiles_${NAME}/Run_${PRESSURE}_l.root"/> -->
         <parameter name="outputFileName" value="simFiles_${NAME}/Analysis_R[fRunNumber]_${PRESSURE}bar_[fRunTag]_[fExperimentName]_${DRIFT}cmDrift_v[fVersion]_signals.root"/>
     <addMetadata type="TRestDetectorReadout" name="iaxoD1Readout" file="iaxo-readouts/readouts/readoutComplete.root"/>
-        <TRestDetectorGas name="Xenon-Neon 48.85Pct-Iso 2.3Pct 10-10E3Vcm" pressure="${PRESSURE}" file="server" /> <!-- "Argon-Isobutane 1Pct 10-10E3Vcm \ Xenon-Neon 48.85Pct-Iso 2.3Pct 10-10E3Vcm -->
+        <TRestDetectorGas name="${MIXTURE}" pressure="${PRESSURE}" file="server" /> <!-- "Argon-Isobutane 1Pct 10-10E3Vcm \ Xenon-Neon 48.85Pct-Iso 2.3Pct 10-10E3Vcm -->
     </TRestRun>
 
     <TRestProcessRunner name="TemplateEventProcess" verboseLevel="info">
