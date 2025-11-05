@@ -2,8 +2,8 @@
     <box name="WorldSolid" x="world_size" y="world_size" z="world_size" lunit="mm"/>
     <tube name="micromegasSolid" startphi="0" deltaphi="360" rmin="0" rmax="50" z="15" aunit="deg" lunit="mm"/>
     <tube name="copperSolidFilled" startphi="0" deltaphi="360" rmin="0" rmax="70" z="35" aunit="deg" lunit="mm"/> 
-    <tube name="leadSolidFilled" startphi="0" deltaphi="360" rmin="0" rmax="170" z="235" aunit="deg" lunit="mm"/> 
-    <tube name="scintSolidFilled" startphi="0" deltaphi="360" rmin="0" rmax="270" z="435" aunit="deg" lunit="mm"/> 
+    <tube name="leadSolidFilled" startphi="0" deltaphi="360" rmin="0" rmax="170" z="135" aunit="deg" lunit="mm"/> 
+    <tube name="scintSolidFilled" startphi="0" deltaphi="360" rmin="0" rmax="270" z="235" aunit="deg" lunit="mm"/> 
     <subtraction name="copperSolid">
         <first ref="copperSolidFilled"/> 
         <second ref="micromegasSolid"/>
