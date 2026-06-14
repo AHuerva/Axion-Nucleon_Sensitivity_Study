@@ -3,7 +3,7 @@
 #include <TTree.h>
 #include <iostream>
 
-void Neutron_Gamma_Counts(const std::string &filePattern) {
+void Counts(const std::string &filePattern) {
   
     auto files = TRestTools::GetFilesMatchingPattern(filePattern);
     
@@ -11,15 +11,15 @@ void Neutron_Gamma_Counts(const std::string &filePattern) {
     int gammas=0; 
     int gamma_prim=0;
     int gamma_aN=0;
-    int gamma_0_10=0;
+    int gamma_0_4=0;
     int gamma_0_20=0;
     int neutrons=0;
     int neutron_prim=0;
     int neutron_aN=0;
-    int neutron_0_10=0;
+    int neutron_0_4=0;
     int neutron_0_20=0;
     int Generated_events=0;
-
+    
     
     for (const auto &fileName : files) {
         std::cout << "Processing file: " << fileName << std::endl;
@@ -63,34 +63,34 @@ void Neutron_Gamma_Counts(const std::string &filePattern) {
     }
 
     TString particleType = event->GetPrimaryEventParticleName();
-    double totalDepositedEnergy = event->GetTotalDepositedEnergy();
+    double SensitiveVolumeEnergy = event->GetSensitiveVolumeEnergy();
 
     if (particleType == "gamma") {
         gammas+=1;
-        if (totalDepositedEnergy < 10000){
-        gamma_0_10+=1;
+        if (SensitiveVolumeEnergy <= 4){
+        gamma_0_4+=1;
         }
-        if (totalDepositedEnergy > 2000 && totalDepositedEnergy < 7000){
+        if (SensitiveVolumeEnergy > 2 && SensitiveVolumeEnergy < 7){
         gamma_prim+=1;
         }
-        if (totalDepositedEnergy > 12000 && totalDepositedEnergy < 17000){
+        if (SensitiveVolumeEnergy > 12 && SensitiveVolumeEnergy < 17){
         gamma_aN+=1;
         }
-        if (totalDepositedEnergy < 20000){
+        if (SensitiveVolumeEnergy < 20){
         gamma_0_20+=1;
         }
     } else if (particleType == "neutron") {
         neutrons+=1;
-        if (totalDepositedEnergy < 10000){
-        neutron_0_10+=1;
+        if (SensitiveVolumeEnergy <= 4){
+        neutron_0_4+=1;
         }
-        if (totalDepositedEnergy > 2000 && totalDepositedEnergy < 7000){
+        if (SensitiveVolumeEnergy > 2 && SensitiveVolumeEnergy < 7){
         neutron_prim+=1;
         }
-        if (totalDepositedEnergy > 12000 && totalDepositedEnergy < 17000){
+        if (SensitiveVolumeEnergy > 12 && SensitiveVolumeEnergy < 17){
         neutron_aN+=1;
         }
-        if (totalDepositedEnergy < 20000){
+        if (SensitiveVolumeEnergy < 20){
         neutron_0_20+=1;
         }
     } else {
@@ -104,16 +104,21 @@ void Neutron_Gamma_Counts(const std::string &filePattern) {
     }
     
     std::cout << "Number of generated events:   "<< Generated_events << std::endl;
-    std::cout << "Number of gammas:   "<< gammas << std::endl;
-    std::cout << "Number of neutrons:   "<< neutrons << std::endl;
-    std::cout << "Number of gammas in range 0-10 keV:   "<< gamma_0_10 << std::endl;
-    std::cout << "Number of gammas in range 2-7 keV (primakoff):   "<< gamma_prim << std::endl;
-    std::cout << "Number of gammas in range 12-17 keV (aN):   "<< gamma_aN << std::endl;
-    std::cout << "Number of gammas in range 0-20 keV (axions):   "<< gamma_0_20 << std::endl;
-    std::cout << "Number of neutrons in range 0-10 keV:   "<< neutron_0_10 << std::endl;
-    std::cout << "Number of neutrons in range 2-7 keV (primakoff):   "<< neutron_prim << std::endl;
-    std::cout << "Number of neutrons in range 12-17 keV (aN):   "<< neutron_aN << std::endl;
-    std::cout << "Number of neutrons in range 0-20 keV (axions):   "<< neutron_0_20 << std::endl;
+    std::cout << "Number of part:   "<< gammas+neutrons << std::endl;
+    std::cout << "Number of part in range 0-4 keV (ABC):   "<< gamma_0_4+neutron_0_4 << std::endl;
+    std::cout << "Number of part in range 2-7 keV (primakoff):   "<< gamma_prim + neutron_prim << std::endl;
+    std::cout << "Number of part in range 12-17 keV (aN):   "<< gamma_aN + neutron_aN << std::endl;
+    std::cout << "Number of part in range 0-20 keV (axions):   "<< gamma_0_20 +neutron_0_20 << std::endl;
+    
+    //std::cout << "Number of neutrons:   "<< neutrons << std::endl;
+    //std::cout << "Number of gammas in range 0-4 keV (ABC):   "<< gamma_0_4 << std::endl;
+    //std::cout << "Number of gammas in range 2-7 keV (primakoff):   "<< gamma_prim << std::endl;
+    //std::cout << "Number of gammas in range 12-17 keV (aN):   "<< gamma_aN << std::endl;
+    //std::cout << "Number of gammas in range 0-20 keV (axions):   "<< gamma_0_20 << std::endl;
+    //std::cout << "Number of neutrons in range 0-4 keV (ABC):   "<< neutron_0_4 << std::endl;
+    //std::cout << "Number of neutrons in range 2-7 keV (primakoff):   "<< neutron_prim << std::endl;
+    //std::cout << "Number of neutrons in range 12-17 keV (aN):   "<< neutron_aN << std::endl;
+    //std::cout << "Number of neutrons in range 0-20 keV (axions):   "<< neutron_0_20 << std::endl;
 
     
    
